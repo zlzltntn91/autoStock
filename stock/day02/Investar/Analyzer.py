@@ -4,14 +4,15 @@ from datetime import datetime
 from datetime import timedelta
 import re
 
+
 class MarketDB:
     def __init__(self):
         """생성자: MariaDB 연결 및 종목코드 딕셔너리 생성"""
-        self.conn = pymysql.connect(host='localhost', user='root', 
-            password='snake.land.', db='INVESTAR', charset='utf8')
+        self.conn = pymysql.connect(host='localhost', user='root',
+                                    password='snake.land.', db='INVESTAR', charset='utf8')
         self.codes = {}
         self.get_comp_info()
-        
+
     def __del__(self):
         """소멸자: MariaDB 연결 해제"""
         self.conn.close()
@@ -49,7 +50,7 @@ class MarketDB:
             if start_day < 1 or start_day > 31:
                 print(f"ValueError: start_day({start_day:d}) is wrong.")
                 return
-            start_date=f"{start_year:04d}-{start_month:02d}-{start_day:02d}"
+            start_date = f"{start_year:04d}-{start_month:02d}-{start_day:02d}"
 
         if end_date is None:
             end_date = datetime.today().strftime('%Y-%m-%d')
@@ -57,7 +58,7 @@ class MarketDB:
         else:
             end_lst = re.split('\D+', end_date)
             if end_lst[0] == '':
-                end_lst = end_lst[1:] 
+                end_lst = end_lst[1:]
             end_year = int(end_lst[0])
             end_month = int(end_lst[1])
             end_day = int(end_lst[2])
@@ -71,7 +72,7 @@ class MarketDB:
                 print(f"ValueError: end_day({end_day:d}) is wrong.")
                 return
             end_date = f"{end_year:04d}-{end_month:02d}-{end_day:02d}"
-         
+
         codes_keys = list(self.codes.keys())
         codes_values = list(self.codes.values())
 
@@ -82,12 +83,8 @@ class MarketDB:
             code = codes_keys[idx]
         else:
             print(f"ValueError: Code({code}) doesn't exist.")
-        sql = f"SELECT * FROM daily_price WHERE code = '{code}'"\
-            f" and date >= '{start_date}' and date <= '{end_date}'"
+        sql = f"SELECT * FROM daily_price WHERE code = '{code}'" \
+              f" and date >= '{start_date}' and date <= '{end_date}'"
         df = pd.read_sql(sql, self.conn)
         df.index = df['date']
-        return df 
-
-
-
-        
+        return df
